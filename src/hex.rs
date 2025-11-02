@@ -1,3 +1,7 @@
+/**
+ * Utilities for printing formatted hex numbers
+ */
+
 ///Formats and returns a 8-bit hex value.
 pub fn to_hex8(i:u8) -> String{
     let h_str: String = format!("{:02X}",i);

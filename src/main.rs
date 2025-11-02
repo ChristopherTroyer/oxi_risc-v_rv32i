@@ -1,8 +1,11 @@
+// RISC-V Simulator Rust implementation
+
 use std::process::exit;
 use clap::Parser;
 use std::path::PathBuf;
 
 mod hex;
+mod register;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
