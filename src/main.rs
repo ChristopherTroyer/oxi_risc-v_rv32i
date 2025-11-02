@@ -2,6 +2,7 @@ use std::process::exit;
 use clap::Parser;
 use std::path::PathBuf;
 
+mod hex;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -18,7 +19,7 @@ struct Cli{
     memory_limit: u32,
     #[arg(short = 'l', long, default_value_t = 0, help="Maximum limit of instructions to execute.")]
     exec_limit: u64,
-    input_file: PathBuf,
+    //input_file: PathBuf,
 }
 
 fn main(){
@@ -27,6 +28,8 @@ fn main(){
 
     dbg!(&args.memory_limit);
     dbg!(&args.exec_limit);
+
+    dbg!(hex::to_hex32(args.memory_limit));
 
     exit(0);
 }
