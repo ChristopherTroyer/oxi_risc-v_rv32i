@@ -117,13 +117,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "384b8ab6d37215f3c5301a95a4accb5d64aa607f1fcb26a11b5303878451b4fe"
 
 [[package]]
-name = "oxi_risc-v_rv32i"
-version = "0.1.0"
-dependencies = [
- "clap",
-]
-
-[[package]]
 name = "proc-macro2"
 version = "1.0.103"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -139,6 +132,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ce25767e7b499d1b604768e7cde645d14cc8584231ea6b295e9c9eb22c02e1d1"
 dependencies = [
  "proc-macro2",
+]
+
+[[package]]
+name = "rv32i"
+version = "0.1.0"
+dependencies = [
+ "clap",
 ]
 
 [[package]]

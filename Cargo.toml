@@ -1,5 +1,5 @@
 [package]
-name = "oxi_risc-v_rv32i"
+name = "rv32i"
 version = "0.1.0"
 edition = "2024"
 
