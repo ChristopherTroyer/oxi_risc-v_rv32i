@@ -1,42 +1,32 @@
 use std::process::exit;
 use clap::Parser;
+use std::path::PathBuf;
 
 
-#[derive(Parser)]
+#[derive(Parser, Debug)]
+#[command(version, about, long_about = None)]
 struct Cli{
-    pattern: String,
-    path: std::path::PathBuf,
+    #[arg(short = 'd',long, help="Show memory disassembly before running simulation.")]
+    disassembly: bool,
+    #[arg(short,long,help="Print instructions during execution.")]
+    instructions: bool,
+    #[arg(short = 'r',long,help="Show dump of hart before each instruction is simulated.")]
+    dump_hart: bool,
+    #[arg(short = 'z',long,help="Show dump of hart status and memory after simulation is haulted.")]
+    dump_hart_after: bool,
+    #[arg(short = 'm',long,default_value_t = 0x100, help="Specify memory size.")]
+    memory_limit: u32,
+    #[arg(short = 'l', long, default_value_t = 0, help="Maximum limit of instructions to execute.")]
+    exec_limit: u64,
+    input_file: PathBuf,
 }
-
-fn usage(){
-    println!("Usage: rv32i [-dirz] [-m hex-mem-size] [-l execution-limit] infile");
-    println!("    -d Show memory disassembly before running simulation.");
-    println!("    -i Print instructions during execution.");
-    println!("    -r show dump of hart before each instruction is simulated.");
-    println!("    -z show dump of hart status and memory after simulation is haulted.");
-    println!("    -m specify memory size (default = 0x100)");
-    println!("    -l maximum limit of instructions to execute. (default = 0 (no limit))");
-    exit(1)
-}
-
-//fn disassemble(){
-//    for 
-//}
-
 
 fn main(){
     let args = Cli::parse();
-    //dbg!(&args);
-    println!("pattern: {:?}, path: {:?}", args.pattern, args.path);
-    //if args.len() == 1{
-    //    usage();
-    //}
+    dbg!(&args);
 
-    //TODO: remove mut after getting these values from arguments, default to these if none
-    let _memory_limit: u32 = 0x100;
-    let _exec_limit: u64 = 0;
-
-
+    dbg!(&args.memory_limit);
+    dbg!(&args.exec_limit);
 
     exit(0);
 }
