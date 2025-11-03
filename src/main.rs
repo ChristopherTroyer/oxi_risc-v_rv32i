@@ -4,6 +4,8 @@ use std::process::exit;
 use clap::Parser;
 use std::path::PathBuf;
 
+use crate::register::RegisterFile;
+
 mod hex;
 mod register;
 
@@ -33,6 +35,10 @@ fn main(){
     dbg!(&args.exec_limit);
 
     dbg!(hex::to_hex32(args.memory_limit));
+
+    let mut RF = RegisterFile::new();
+    RF.reset();
+    RF.dump("header".to_string());
 
     exit(0);
 }

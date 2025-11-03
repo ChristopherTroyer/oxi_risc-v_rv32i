@@ -1,47 +1,45 @@
-use crate::register;
-
 /**
  * CPU register simulator
  */
 pub struct RegisterFile{
-    regs: Vec<i32>,
+    regs: Vec<u32>,
 }
 
 impl RegisterFile {
-    pub fn new() -> RegisterFile {
+    pub fn new() -> Self {
         let mut regs = Vec::new();
-        RegisterFile::init_regs();
+        regs.resize(32,0);
+        //reset();
+
         RegisterFile { regs }
     }
 
-    fn init_regs(){
-        regs.resize(32,0);
-        reset();
+    fn init_regs(&mut self){
+        self.regs.resize(32, 0);
+        self.reset();
     }
 
-    pub fn reset(){
-        Self::set(r,0,0);
+    pub fn reset(&mut self){
+        self.set(0,0);
 
-        for i in 0..regs.len() as i32 {
-            Self::set(r,i as u32,0xf0f0f0f0);
+        for i in 0..self.regs.len() as i32 {
+            self.set(i as u32,0xf0f0f0f0);
         }
-
     }
 
-    pub fn set(reg:u32, val:i32){
+    pub fn set(&mut self, reg:u32, val:u32){
         if reg == 0 {
              return;
         }
-        regs[reg as usize] = val;
-
+        self.regs[reg as usize] = val;
     }
 
-    pub fn get(reg:u32) -> i32{
-        regs[reg as usize]
+    pub fn get(&self, reg:u32) -> u32{
+        self.regs[reg as usize]
     }
 
-    pub fn dump(hdr:String){
-        
+    pub fn dump(&self, hdr:String){
+        println!("your header here: {}", hdr); //placeholder
     }
     
 }
