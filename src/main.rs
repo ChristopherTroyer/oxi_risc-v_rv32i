@@ -29,16 +29,20 @@ struct Cli{
 
 fn main(){
     let args = Cli::parse();
-    dbg!(&args);
+    //dbg!(&args);
 
-    dbg!(&args.memory_limit);
-    dbg!(&args.exec_limit);
+    //dbg!(&args.memory_limit);
+    //dbg!(&args.exec_limit);
 
-    dbg!(hex::to_hex32(args.memory_limit));
+   // dbg!(hex::to_hex32(args.memory_limit));
 
     let mut RF = RegisterFile::new();
+    //RF.reset();
+    //RF.dump("header".to_string());
+    println!("{}", hex::to_hex0x32(RF.get(1)));
+    RF.set(1,32);
+    println!("{}", hex::to_hex0x32(RF.get(1)));
     RF.reset();
-    RF.dump("header".to_string());
-
+    println!("{}", hex::to_hex0x32(RF.get(1)));
     exit(0);
 }
