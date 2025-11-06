@@ -8,6 +8,7 @@ use crate::register::RegisterFile;
 
 mod hex;
 mod register;
+mod memory;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]

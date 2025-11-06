@@ -3,7 +3,21 @@
  */
 use crate::hex;
 
-//class memory : public hex
+struct Memory{
+    mem: Vec<u8>,
+}
+
+impl Memory {
+    pub fn new(mut s:u32) -> Memory {
+        let mut mem = Vec::new();
+        s = (s+15)&0xfffffff0;
+        mem.resize(s.try_into().unwrap(), 0xa5);
+        let mut memory = Memory { mem };
+        memory
+    }
+}
+
+/* //class memory : public hex
     //public:
         /**
          * @param s Amount of memory to create and populate in bytes 
@@ -84,4 +98,4 @@ use crate::hex;
         //bool load_file(const std::string &fname);
 
     //private:
-        //std::vector<uint8_t> mem;   ///Memory buffer
+        //std::vector<uint8_t> mem;   ///Memory buffer */

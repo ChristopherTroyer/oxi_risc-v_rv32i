@@ -65,10 +65,10 @@ impl RegisterFile {
             for x in index..index+8{
                 print!("{}", hex::to_hex32(self.get(x as u32)));
 
-                if ((x-index)==3){
+                if (x-index)==3{
                     print!(" ");
                 }
-                if ((x-index)!=7){
+                if (x-index)!=7{
                     print!(" ");
                 }
             }
