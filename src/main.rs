@@ -5,6 +5,7 @@ use clap::Parser;
 use std::path::PathBuf;
 
 use crate::register::RegisterFile;
+use crate::memory::Memory;
 
 mod hex;
 mod register;
@@ -40,10 +41,16 @@ fn main(){
     let mut RF = RegisterFile::new();
     //RF.reset();
     //RF.dump("header".to_string());
-    println!("{}", hex::to_hex0x32(RF.get(1)));
-    RF.set(1,32);
-    println!("{}", hex::to_hex0x32(RF.get(1)));
-    RF.reset();
-    println!("{}", hex::to_hex0x32(RF.get(1)));
+    //println!("{}", hex::to_hex0x32(RF.get(1)));
+    //RF.set(1,32);
+    //println!("{}", hex::to_hex0x32(RF.get(1)));
+    //RF.reset();
+    //println!("{}", hex::to_hex0x32(RF.get(1)));
+    let mut MEM = Memory::new(0x64);
+    println!("{}", MEM.get8(0));
+    MEM.set8(0, 8);
+    println!("{}", MEM.get8(0));
+    MEM.dump();
+
     exit(0);
 }
