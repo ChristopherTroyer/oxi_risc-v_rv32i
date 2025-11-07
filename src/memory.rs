@@ -65,6 +65,27 @@ impl Memory {
     /**@}*/
 
     /**
+     * getX Get little-endian, sign-extended
+     * Read and return value from memory 
+     *
+     * addr Lowest address from which to return a value from.
+     * returns an appropriately sized int containing the value in addr.
+     * @{
+     */
+    pub fn get8_sx(&self, addr:u32) -> u32{
+        let x: u32 = self.get8(addr) as u32;
+        x | if x & 0x00000080 != 0 { 0xffffff00 } else { 0 }
+    }
+    pub fn get16_sx(&self, addr:u32) -> u32{
+        let x: u32 = self.get16(addr) as u32;
+        x | if x & 0x00008000 != 0 { 0xffff0000 } else { 0 }
+    }
+    pub fn get32_sx(&self, addr:u32) -> u32{
+        self.get32(addr)
+    }
+    /**@}*/
+
+    /**
     * getX Set little-endian value
     * Write a specified value into specified location in memory.
     *
@@ -101,8 +122,6 @@ impl Memory {
     }
     /**@}*/
 
-
-
     /**
     * Prints entire contents of memory as both hex and ASCII
     * 
@@ -126,69 +145,3 @@ impl Memory {
         }
     }
 }
-
-/* //class memory : public hex
-        /**
-         * @brief Destroy the memory object
-         */
-        //~memory();
-
-        /**
-         * @brief Checks if passed address is legal
-         * 
-         * @param addr Address passed
-         * @return true if passed address is a valid location in memory
-         */
-        //bool check_illegal(uint32_t addr) const;
-
-
-        /**
-         * @defgroup getX Get little-endian
-         * Read and return value from memory 
-         *
-         * @param addr Lowest address from which to return a value from.
-         * @return returns an appropriately sized int containing the value in addr.
-         * @{
-         */
-        //uint8_t get8(uint32_t addr) const;    ///Get an 8-bit value from memory.
-        //uint16_t get16(uint32_t addr) const;  ///Get a 16-bit value from memory.
-        //uint32_t get32(uint32_t addr) const;  ///Get a 32-bit value from memory.
-        /**@}*/
-
-        /**
-         * @defgroup getX Get little-endian, sign-extended
-         * Read and return value from memory 
-         *
-         * @param addr Lowest address from which to return a value from.
-         * @return returns an appropriately sized int containing the value in addr.
-         * @{
-         */
-        //int32_t get8_sx(uint32_t addr) const; ///Get an 8-bit value from memory and  sign-extend it.
-        //int32_t get16_sx(uint32_t addr) const; ///Get a 16-bit value from memory and  sign-extend it.
-        //int32_t get32_sx(uint32_t addr) const; ///Get a 32-bit value from memory and  sign-extend it.
-        /**@}*/
-
-        /**
-         * @defgroup getX Set little-endian value
-         * Write a specified value into specified location in memory.
-         *
-         * @param addr Lowest address from which to write a value into.
-         * @param val  Value to be written into addr
-         * @{
-         */
-        //void set8(uint32_t addr, uint8_t val); //Set an 8-bit value in memory.
-        //void set16(uint32_t addr, uint16_t val); //Set a 16-bit value in memory.
-        //void set32(uint32_t addr, uint32_t val); //Set a 32-bit value in memory.
-        /**@}*/
-
-        /**
-         * @brief Opens a file in binary mode and attempts to load it into memory.
-         * 
-         * @param fname File to be loaded into memory.
-         * @return true if file was opened and entirely loaded without issue.
-         * @return false if file failed to open or was too big for current amount of memory.
-         */
-        //bool load_file(const std::string &fname);
-
-    //private:
-        //std::vector<uint8_t> mem;   ///Memory buffer */
