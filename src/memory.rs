@@ -42,13 +42,25 @@ impl Memory {
     * @return returns an appropriately sized int containing the value in addr.
     * @{
     */
-    pub fn get8(&self, addr:u32) -> u8{ ///Get an 8-bit value from memory.
+    pub fn get8(&self, addr:u32) -> u8{ //Get an 8-bit value from memory.
         if !self.check_illegal(addr) {
             self.mem[addr as usize]
         }
         else{
             0
         }
+    }
+    pub fn get16(&self, addr:u32) -> u16{ //Get an 16-bit value from memory.
+        let x = self.get8(addr) as u16;
+        let y = self.get8(addr+1) as u16;
+
+        x|y<<8
+    }
+    pub fn get32(&self, addr:u32) -> u32{ //Get an 16-bit value from memory.
+        let x = self.get16(addr) as u32;
+        let y = self.get16(addr+2) as u32;
+
+        x|y<<16
     }
     /**@}*/
 
@@ -62,7 +74,29 @@ impl Memory {
     */
     pub fn set8(& mut self, addr:u32, val:u8){
         if !self.check_illegal(addr) {
-            self.mem[addr as usize] = val;
+            let v = val.to_le_bytes();
+            self.mem[addr as usize] = v[0];
+        }
+    }
+    pub fn set16(& mut self, addr:u32, val:u16){
+        if !self.check_illegal(addr) {
+            let v = val.to_le_bytes();
+            println!("{:?}", v);
+            self.mem[addr as usize] = v[0];
+            self.mem[(addr+1) as usize] = v[1];
+        }
+        //self.set8(addr, val);
+        //self.set8(addr+2, val as u8 >> 8);
+        //self.set8(addr, val as u8);
+    }
+    pub fn set32(& mut self, addr:u32, val:u32){
+        if !self.check_illegal(addr) {
+            let v = val.to_le_bytes();
+            println!("{:?}", v);
+            self.mem[addr as usize] = v[0];
+            self.mem[(addr+1) as usize] = v[1];
+            self.mem[(addr+2) as usize] = v[2];
+            self.mem[(addr+3) as usize] = v[3];
         }
     }
     /**@}*/

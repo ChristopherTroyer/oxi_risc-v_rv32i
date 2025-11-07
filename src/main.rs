@@ -47,9 +47,15 @@ fn main(){
     //RF.reset();
     //println!("{}", hex::to_hex0x32(RF.get(1)));
     let mut MEM = Memory::new(0x64);
-    println!("{}", MEM.get8(0));
-    MEM.set8(0, 8);
-    println!("{}", MEM.get8(0));
+    //println!("{}", MEM.get32(0));
+    //MEM.set32(0, 69696969);
+    
+    //MEM.set8(0, 8);
+    //MEM.set8(0, 16);
+    //MEM.set8(0, 128);
+    //MEM.set8(0, 255);
+    MEM.set32(101, 1);
+    //println!("{}", MEM.get32(0));
     MEM.dump();
 
     exit(0);
