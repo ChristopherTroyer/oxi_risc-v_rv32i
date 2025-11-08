@@ -2,6 +2,9 @@
  * Simulation of memory with a capacity of a requested amount of bytes
  */
 use crate::hex;
+use std::fs;
+use std::env;
+use std::path;
 
 pub struct Memory{
     mem: Vec<u8>,
@@ -143,5 +146,25 @@ impl Memory {
             }
             println!();  
         }
+    }
+
+    pub fn load_file(&self, fname: &String) -> bool{
+        let mut loadState = true; //Return value, only changes upon failure
+
+        let file = fs::read_to_string(fname);
+        match file{
+            Err(_) => {
+                loadState = false;
+                println!("Can't open file {} for reading.", fname)
+            },
+            Ok(_) => {
+                println!("begin load"); //TODO
+            },
+        }
+            
+
+        
+
+        loadState
     }
 }
