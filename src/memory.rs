@@ -148,22 +148,30 @@ impl Memory {
         }
     }
 
-    pub fn load_file(&self, fname: &String) -> bool{
+    pub fn load_file(& mut self, fname: String) -> bool{
         let mut loadState = true; //Return value, only changes upon failure
 
-        let file = fs::read_to_string(fname);
+        let file = fs::read(&fname);
         match file{
-            Err(_) => {
-                loadState = false;
-                println!("Can't open file {} for reading.", fname)
-            },
-            Ok(_) => {
+            Ok(content) => {
+                //let real_file = file.unwrap();
                 println!("begin load"); //TODO
+                if self.check_illegal(content.len() as u32){
+                    println!("Program too big.");
+                    loadState = false;
+                }
+                else {
+                    for byte in 0..content.len(){
+                        //println!("{}", byte);
+                        self.mem[byte] = content[byte];
+                }
+                }
+            },
+            Err(error) => {
+                loadState = false;
+                println!("Can't open file {} for reading, error: {}", &fname, error)
             },
         }
-            
-
-        
 
         loadState
     }

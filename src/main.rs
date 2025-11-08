@@ -54,8 +54,10 @@ fn main(){
     //MEM.set8(0, 16);
     //MEM.set8(0, 128);
     //MEM.set8(0, 255);
-    MEM.set32(101, 1);
+    //MEM.set32(101, 1);
     //println!("{}", MEM.get32(0));
+    MEM.dump();
+    MEM.load_file("target/debug/input/align.bin".to_string());
     MEM.dump();
 
     exit(0);
