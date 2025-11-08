@@ -26,39 +26,45 @@ struct Cli{
     memory_limit: u32,
     #[arg(short = 'l', long, default_value_t = 0, help="Maximum limit of instructions to execute.")]
     exec_limit: u64,
-    //input_file: PathBuf,
+    #[arg(value_name = "FILE", help="Input file to load into memory.",required=true)]
+    input_file: PathBuf,
 }
 
 fn main(){
     let args = Cli::parse();
-    //dbg!(&args);
-
-    //dbg!(&args.memory_limit);
-    //dbg!(&args.exec_limit);
-
-   // dbg!(hex::to_hex32(args.memory_limit));
-
     let mut RF = RegisterFile::new();
-    //RF.reset();
-    //RF.dump("header".to_string());
-    //println!("{}", hex::to_hex0x32(RF.get(1)));
-    //RF.set(1,32);
-    //println!("{}", hex::to_hex0x32(RF.get(1)));
-    //RF.reset();
-    //println!("{}", hex::to_hex0x32(RF.get(1)));
-    let mut MEM = Memory::new(0x64);
-    //println!("{}", MEM.get32(0));
-    //MEM.set32(0, 69696969);
-    
-    //MEM.set8(0, 8);
-    //MEM.set8(0, 16);
-    //MEM.set8(0, 128);
-    //MEM.set8(0, 255);
-    //MEM.set32(101, 1);
-    //println!("{}", MEM.get32(0));
+    let mut MEM = Memory::new(args.memory_limit);
+    let filename = args.input_file;
+    println!("Loading file: {:?}", filename);
+
     MEM.dump();
     MEM.load_file("target/debug/input/align.bin".to_string());
     MEM.dump();
 
     exit(0);
+}
+
+#[cfg(test)]
+mod tests{
+    use super::*;
+
+    #[test]
+    fn test_hex(){
+        assert_eq!(hex::to_hex8(255), "ff");
+        assert_eq!(hex::to_hex32(4294967295), "ffffffff");
+        assert_eq!(hex::to_hex0x12(4095), "0xfff");
+        assert_eq!(hex::to_hex0x20(0xfffff), "0xfffff");
+        assert_eq!(hex::to_hex0x32(4294967295), "0xffffffff");
+    }
+
+    #[test]
+    fn test_registers(){
+        let mut RF = RegisterFile::new();
+        RF.set(1, 1234);
+        assert_eq!(RF.get(1), 1234);
+        RF.set(0, 5678);
+        assert_eq!(RF.get(0), 0);
+        RF.reset();
+        assert_eq!(RF.get(1), 0xf0f0f0f0);
+    }
 }
