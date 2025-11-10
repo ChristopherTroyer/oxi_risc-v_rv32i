@@ -148,7 +148,7 @@ impl Memory {
 
             for x in index..index+16{ //ascii printable HEX 21 to 7E
                 let num = self.get8(x) as char;
-                if num.is_ascii_alphanumeric()  { //TODO: replace with more robust printing check 
+                if num.is_ascii_graphic()  {
                     print!("{}", num as char);
                 }
                 else{
@@ -156,7 +156,7 @@ impl Memory {
                 }
             }
 
-            println!();  
+            println!("*");  
         }
     }
 
