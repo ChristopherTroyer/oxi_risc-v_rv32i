@@ -26,16 +26,16 @@ struct Cli{
     memory_limit: u32,
     #[arg(short = 'l', long, default_value_t = 0, help="Maximum limit of instructions to execute.")]
     exec_limit: u64,
-    #[arg(value_name = "FILE", help="Input file to load into memory.",required=true)]
-    input_file: PathBuf,
+    //#[arg(value_name = "FILE", help="Input file to load into memory.",required=true)]
+    //input_file: PathBuf,
 }
 
 fn main(){
     let args = Cli::parse();
     let mut RF = RegisterFile::new();
     let mut MEM = Memory::new(args.memory_limit);
-    let filename = args.input_file;
-    println!("Loading file: {:?}", filename);
+    //let filename = args.input_file;
+    //println!("Loading file: {:?}", filename);
 
     MEM.dump();
     MEM.load_file("target/debug/input/align.bin".to_string());

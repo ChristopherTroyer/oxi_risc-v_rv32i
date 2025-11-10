@@ -131,19 +131,31 @@ impl Memory {
     */
     pub fn dump(&self){
         for index in (0..self.get_size()).step_by(16) {
-            let reg = "x".to_owned()+&index.to_string();
-            print!("{:>3} ",reg);
+            print!("{:>8}: ",hex::to_hex32(index));
 
-            for x in index..index+8{
+            for x in index..index+16{
                 print!("{}", hex::to_hex8(self.get8(x as u32)));
 
-                if (x-index)==3{ //space at mid point
-                    print!(" ");
+                if (x-index)==7{ //space at mid point
+                    print!("  ");
                 }
                 if (x-index)!=7{
                     print!(" ");
                 }
             }
+
+            print!("*");
+
+            for x in index..index+16{ //ascii printable HEX 21 to 7E
+                let num = self.get8(x) as char;
+                if num.is_ascii_alphanumeric()  { //TODO: replace with more robust printing check 
+                    print!("{}", num as char);
+                }
+                else{
+                    print!(".");
+                }
+            }
+
             println!();  
         }
     }
@@ -155,7 +167,7 @@ impl Memory {
         match file{
             Ok(content) => {
                 //let real_file = file.unwrap();
-                println!("begin load"); //TODO
+                //println!("begin load"); //TODO
                 if self.check_illegal(content.len() as u32){
                     println!("Program too big.");
                     loadState = false;
