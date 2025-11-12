@@ -30,16 +30,30 @@ struct Cli{
     //input_file: PathBuf,
 }
 
+/**
+ *  loops through memory and decodes each 32-bit instruction
+ *  mem current system memory
+ */
+fn disassemble(mem:Memory){
+    for i in (0..mem.get_size()).step_by(4){
+        print!("{:>8}: ", i);
+        print!("{:>8}", mem.get32(i));
+        //render instruction via decode function
+        println!("");
+    }
+}
+
 fn main(){
     let args = Cli::parse();
-    let mut RF = RegisterFile::new();
-    let mut MEM = Memory::new(args.memory_limit);
+    //let rf = RegisterFile::new();
+    let mut mem = Memory::new(args.memory_limit);
     //let filename = args.input_file;
     //println!("Loading file: {:?}", filename);
 
-    MEM.dump();
-    MEM.load_file("target/debug/input/align.bin".to_string());
-    MEM.dump();
+    //MEM.dump();
+    mem.load_file("target/debug/input/align.bin".to_string());
+    //mem.dump();
+    disassemble(mem);
 
     exit(0);
 }
