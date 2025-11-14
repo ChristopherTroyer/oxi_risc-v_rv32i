@@ -10,6 +10,7 @@ use crate::memory::Memory;
 mod hex;
 mod register;
 mod memory;
+mod rv32i_decode;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
