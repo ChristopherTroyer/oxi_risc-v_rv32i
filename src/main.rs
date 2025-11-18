@@ -40,7 +40,9 @@ fn disassemble(mem:Memory){
         print!("{:>8}: ", i);
         print!("{:>8}", mem.get32(i));
         //render instruction via decode function
-        println!("");
+        print!(" -> ");
+        //println!(" {}", rv32i_decode::decode(i,mem.get32(i)));
+        rv32i_decode::decode(i,mem.get32(i));
     }
 }
 

@@ -83,51 +83,51 @@ fn get_imm_i(insn:u32) -> i32{
     if (imm_i & 0x800) != 0 {
         imm_i |= 0xfffff000;
     }
-    imm_i
+    imm_i as i32
 }
 
 fn get_imm_u(insn:u32) -> i32{
     //Zero Extended on the right
-    let imm_u: i32 = insn as i32 & 0xfffff000;
-    imm_u
+    let imm_u: u32 = insn & 0xfffff000;
+    imm_u as i32
 }
 
 fn get_imm_b(insn:u32) -> i32{
-    let mut imm_b: i32 = (insn as i32 & 0x80000000) >> (31-12);
-    imm_b |= (insn as i32  & 0x7e000000) >> (25-5);
-    imm_b |= (insn as i32  & 0x00000f00) >> (8-1);
-    imm_b |= (insn as i32  & 0x00000080) << (11-7);
+    let mut imm_b: u32 = (insn & 0x80000000) >> (31-12);
+    imm_b |= (insn & 0x7e000000) >> (25-5);
+    imm_b |= (insn & 0x00000f00) >> (8-1);
+    imm_b |= (insn & 0x00000080) << (11-7);
 
     //sign exted the left
-    if (insn as i32 & 0x80000000) != 0{
+    if (insn & 0x80000000) != 0{
         imm_b |= 0xffffe000;
     }
 
-    imm_b
+    imm_b as i32
 }
 
 fn get_imm_s(insn:u32) -> i32{
-    let mut imm_s: i32 = (insn as i32  & 0xfe000000) >> (25-5);
-    imm_s |= (insn as i32  & 0x00000f80) >> (7-0);
+    let mut imm_s: u32 = (insn & 0xfe000000) >> (25-5);
+    imm_s |= (insn & 0x00000f80) >> (7-0);
     
-    if (insn as i32  & 0x80000000) != 0{
+    if (insn & 0x80000000) != 0{
         imm_s |= 0xfffff000; // sign-extend the left
     }
 
-    imm_s
+    imm_s as i32
 }
 
 fn get_imm_j(insn:u32) -> i32{
-    let mut imm_j: i32 = (insn as i32  & 0x80000000) >> (31-20);
-    imm_j |= (insn as i32  & 0x7fe00000) >> (21-1);
-    imm_j |= (insn as i32  & 0x00100000) >> (20-11);
-    imm_j |= (insn as i32  & 0x000ff000);
+    let mut imm_j: u32 = (insn & 0x80000000) >> (31-20);
+    imm_j |= (insn & 0x7fe00000) >> (21-1);
+    imm_j |= (insn & 0x00100000) >> (20-11);
+    imm_j |= (insn & 0x000ff000);
 
-    if (insn as i32 & 0x80000000) != 0{
+    if (insn & 0x80000000) != 0{
         imm_j |= 0xffe00000;
     }
 
-    imm_j
+    imm_j as i32
 }
 
 //render instructions
@@ -145,79 +145,144 @@ fn render_illegal_insn(insn:u32) -> String{
 }
 
 fn render_lui(insn:u32) -> String{
-    let rd = get_rd(insn);
-    let imm_u = get_imm_u(insn);
+    let rd: u32 = get_rd(insn);
+    let imm_u: i32 = get_imm_u(insn);
     format!("{}{},{}",render_mnemonic("lui".to_string()),render_reg(rd),to_hex0x20((imm_u as u32>>12)&0x0fffff))
 }
 
 fn render_auipc(insn:u32) -> String{
-    let rd = get_rd(insn);
-    let imm_u = get_imm_u(insn);
+    let rd: u32 = get_rd(insn);
+    let imm_u: i32 = get_imm_u(insn);
     format!("{}{},{}",render_mnemonic("auipc".to_string()),render_reg(rd),to_hex0x20((imm_u as u32>>12)&0x0fffff))
 }
 
 fn render_jal(addr:u32, insn:u32) -> String{
-    let rd = get_rd(insn);
-    let imm_j = get_imm_j(insn);
+    let rd: u32 = get_rd(insn);
+    let imm_j: i32 = get_imm_j(insn);
     format!("{}{},{}",render_mnemonic("jal".to_string()),render_reg(rd),hex::to_hex0x32(imm_j as u32 + addr))
 }
 
 fn render_jalr(insn:u32) -> String{
-    let rd = get_rd(insn);
-    let rs1 = get_rs1(insn);
-    let imm_i = get_imm_i(insn);
+    let rd: u32 = get_rd(insn);
+    let rs1: u32 = get_rs1(insn);
+    let imm_i: i32 = get_imm_i(insn);
     format!("{}{},{}",render_mnemonic("jal".to_string()),render_reg(rd),render_base_disp(imm_i, rs1))
 }
 
 //types
 
 fn render_btype(addr:u32, insn:u32, mnemonic:String) -> String{
-    
+    let imm_b: i32 = get_imm_b(insn);
+    let rs1: u32 = get_rs1(insn);
+    let rs2: u32 = get_rs2(insn);
+
+    format!("{}{},{},{}", render_mnemonic(mnemonic), render_reg(rs1),render_reg(rs2),hex::to_hex0x32(imm_b as u32+addr))
 }
 
 fn render_itype_load(insn:u32, mnemonic:String) -> String{
+    let rd: u32 = get_rd(insn);
+    let rs1: u32 = get_rs1(insn);
+    let imm_i: i32 = get_imm_i(insn);
     
+    format!("{}{},{}", render_mnemonic(mnemonic),render_reg(rd),render_base_disp(imm_i, rs1))
 }
 
 fn render_stype(insn:u32, mnemonic:String) -> String{
-    
+    let imm_s: i32 = get_imm_s(insn);
+    let rs1: u32 = get_rs1(insn);
+    let rs2: u32 = get_rs2(insn);
+
+    format!("{}{},{}", render_mnemonic(mnemonic),render_reg(rs2),render_base_disp(imm_s, rs1))
 }
 
 fn render_itype_alu(insn:u32, mnemonic:String, imm_i:i32) -> String{
-    
+    let rd: u32 = get_rd(insn);
+    let rs1: u32 = get_rs1(insn);
+
+    format!("{}{},{},{}",render_mnemonic(mnemonic),render_reg(rd),render_reg(rs1),imm_i)
 }
 
 fn render_rtype(insn:u32, mnemonic:String) -> String{
-    
+    let rd: u32 = get_rd(insn);
+    let rs1: u32 = get_rs1(insn);
+    let rs2: u32 = get_rs2(insn);
+
+    format!("{}{},{},{}", render_mnemonic(mnemonic),render_reg(rd),render_reg(rs1),render_reg(rs2))
 }
 
 //render controls
 
-fn render_ecall(insn:u32, mnemonic:String) -> String{
+fn render_ecall(_insn:u32) -> String{
     "ecall".to_string()
 }
 
-fn render_ebreak(insn:u32, mnemonic:String) -> String{
+fn render_ebreak(_insn:u32) -> String{
     "ebreak".to_string()
 }
 
 //helpers
 
 fn render_csrrx(insn:u32, mnemonic:String) -> String{
-    
+    let rd: u32 = get_rd(insn);
+    let rs1: u32 = get_rs1(insn);
+    let imm_u: u32 = get_imm_u(insn) as u32;
+
+    format!("{}{},{},{}", render_mnemonic(mnemonic), render_reg(rd),hex::to_hex0x12((imm_u>>20)&0xfff), render_reg(rs1))
 }
 
 fn render_csrrxi(insn:u32, mnemonic:String) -> String{
-    
+    let rd: u32 = get_rd(insn);
+    let rs1: u32 = get_rs1(insn);
+    let imm_u: u32 = get_imm_u(insn) as u32;
+
+    format!("{}{},{},{}", render_mnemonic(mnemonic), render_reg(rd),hex::to_hex0x12((imm_u>>20)&0xfff), rs1)
 }
 
 fn render_base_disp(base:i32, disp:u32) -> String{
-
+    format!("{}({})",base,render_reg(disp))
 }
 
 //Big decode monster
 //Look into improving dispatch
 
-fn decode(addr:u32, insn:u32) -> String{
+pub fn decode(addr:u32, insn:u32) -> String{
+    let opcode:u32 = get_opcode(insn);
+    let funct3: u32 = get_func3(insn);
+    let funct7:u32 = get_func7(insn);
+    let imm_i: u32 = get_imm_i(insn) as u32;
 
+    println!("opcode={} funct3={} funct7={} imm_i={}", opcode,funct3,funct7,imm_i);
+    //"DEBUG NOT IMPLEMENTED".to_string()
+
+    match opcode{
+        OPCODE_SYSTEM => match funct3{
+            FUNCT3_CSRRW => return render_csrrx(insn, "csrrw".to_string()),
+            FUNCT3_CSRRS => return render_csrrx(insn, "csrrs".to_string()),
+            FUNCT3_CSRRC => return render_csrrx(insn, "csrrc".to_string()),
+            FUNCT3_CSRRWI => return render_csrrx(insn, "csrrwi".to_string()),
+            FUNCT3_CSRRSI => return render_csrrx(insn, "csrrsi".to_string()),
+            FUNCT3_CSRRCI => return render_csrrx(insn, "csrrci".to_string()),
+            FUNCT3_BEQ => match insn{
+                INSN_EBREAK => render_ebreak(insn),
+                INSN_ECALL => render_ecall(insn),
+                _ => render_illegal_insn(insn)
+            }
+            _ => render_illegal_insn(insn)
+            //replaced assert(0 && "unrecognized imm_i"); with panic but likely not needed
+            //panic!("unrecognized immi")
+        }
+
+        OPCODE_LUI => return render_lui(insn),
+        OPCODE_AUIPC => return render_auipc(insn),
+        OPCODE_JAL => return render_jal(addr, insn),
+        OPCODE_JALR => return render_jalr(insn),
+        OPCODE_BTYPE => match funct3 {
+            //TODO: FILL IN AND CONTINUE FROM LINE 271 in rv32i_decode.cpp
+            _ => return render_illegal_insn(insn),
+        }
+
+
+        //catch-all
+        _ => return render_illegal_insn(insn),
+    }
 }
