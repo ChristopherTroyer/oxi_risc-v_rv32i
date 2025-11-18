@@ -277,10 +277,35 @@ pub fn decode(addr:u32, insn:u32) -> String{
         OPCODE_JAL => return render_jal(addr, insn),
         OPCODE_JALR => return render_jalr(insn),
         OPCODE_BTYPE => match funct3 {
-            //TODO: FILL IN AND CONTINUE FROM LINE 271 in rv32i_decode.cpp
+            FUNCT3_BEQ => return render_btype(addr, insn, "beq".to_string()),
+            FUNCT3_BNE => return render_btype(addr, insn, "bne".to_string()),
+            FUNCT3_BLT => return render_btype(addr, insn, "blt".to_string()),
+            FUNCT3_BGE => return render_btype(addr, insn, "bge".to_string()),
+            FUNCT3_BLTU => return render_btype(addr, insn, "bltu".to_string()),
+            FUNCT3_BGEU => return render_btype(addr, insn, "bgeu".to_string()),
             _ => return render_illegal_insn(insn),
         }
 
+        OPCODE_LOAD_IMM => match funct3 {
+            FUNCT3_LB => return render_itype_load(insn, "lb".to_string()),
+            FUNCT3_LH => return render_itype_load(insn, "lh".to_string()),
+            FUNCT3_LW => return render_itype_load(insn, "lw".to_string()),
+            FUNCT3_LBU => return render_itype_load(insn, "lbu".to_string()),
+            FUNCT3_LHU => return render_itype_load(insn, "lhu".to_string()),
+            _ => return render_illegal_insn(insn),
+        }
+
+        OPCODE_STYPE => match funct3 {
+            FUNCT3_SB => return render_stype(insn, "sb".to_string()),
+            FUNCT3_SH => return render_stype(insn, "sh".to_string()),
+            FUNCT3_SW => return render_stype(insn, "sw".to_string()),
+            _ => return render_illegal_insn(insn),
+        }
+
+        OPCODE_ALU_IMM => match funct3 {
+            //TODO: FILL IN AND CONTINUE FROM LINE 306 in rv32i_decode.cpp
+            _ => return render_illegal_insn(insn),
+        }
 
         //catch-all
         _ => return render_illegal_insn(insn),
