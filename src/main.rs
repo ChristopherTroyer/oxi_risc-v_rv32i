@@ -42,7 +42,7 @@ fn disassemble(mem:Memory){
         //render instruction via decode function
         print!(" -> ");
         //println!(" {}", rv32i_decode::decode(i,mem.get32(i)));
-        rv32i_decode::decode(i,mem.get32(i));
+        println!("{}",rv32i_decode::decode(i,mem.get32(i)));
     }
 }
 
