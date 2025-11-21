@@ -23,7 +23,7 @@ struct Cli{
     dump_hart: bool,
     #[arg(short = 'z',long,help="Show dump of hart status and memory after simulation is haulted.")]
     dump_hart_after: bool,
-    #[arg(short = 'm',long,default_value_t = 0x100, help="Specify memory size.")]
+    #[arg(short = 'm',long,default_value_t = 0x8500, help="Specify memory size.")] //default 0x100
     memory_limit: u32,
     #[arg(short = 'l', long, default_value_t = 0, help="Maximum limit of instructions to execute.")]
     exec_limit: u64,
@@ -54,7 +54,7 @@ fn main(){
     //println!("Loading file: {:?}", filename);
 
     //MEM.dump();
-    mem.load_file("target/debug/input/align.bin".to_string());
+    mem.load_file("target/debug/input/torture5.bin".to_string());
     //mem.dump();
     disassemble(mem);
 

@@ -161,7 +161,7 @@ fn render_auipc(insn:u32) -> String{
 fn render_jal(addr:u32, insn:u32) -> String{
     let rd: u32 = get_rd(insn);
     let imm_j: i32 = get_imm_j(insn);
-    format!("{}{},{}",render_mnemonic("jal"),render_reg(rd),hex::to_hex0x32(imm_j as u32 + addr))
+    format!("{}{},{}",render_mnemonic("jal"),render_reg(rd),hex::to_hex0x32(imm_j.wrapping_add_unsigned(addr) as u32)) //POSSIBLY NOT CORRECT BUT WRAPPING TO AVOID OVERFLOW PANIC
 }
 
 fn render_jalr(insn:u32) -> String{
@@ -178,7 +178,7 @@ fn render_btype(addr:u32, insn:u32, mnemonic:&str) -> String{
     let rs1: u32 = get_rs1(insn);
     let rs2: u32 = get_rs2(insn);
 
-    format!("{}{},{},{}", render_mnemonic(mnemonic), render_reg(rs1),render_reg(rs2),hex::to_hex0x32(imm_b as u32+addr))
+    format!("{}{},{},{}", render_mnemonic(mnemonic), render_reg(rs1),render_reg(rs2),hex::to_hex0x32(imm_b.wrapping_add_unsigned(addr) as u32)) //POSSIBLY NOT CORRECT BUT WRAPPING TO AVOID OVERFLOW PANIC
 }
 
 fn render_itype_load(insn:u32, mnemonic:&str) -> String{
