@@ -322,9 +322,26 @@ pub fn decode(addr:u32, insn:u32) -> String{
 
         OPCODE_RTYPE => match funct3 {
             //TODO: FILL IN AND CONTINUE FROM LINE 323 in rv32i_decode.cpp
+            FUNCT3_ADD => match(funct7){
+                FUNCT7_ADD => return render_rtype(insn, "add"),
+                FUNCT7_SUB => return render_rtype(insn, "sub"),
+                _ => return render_illegal_insn(insn),
+            }
+
+            FUNCT3_SRX => match(funct7){
+                FUNCT7_SRA => return render_rtype(insn, "sra"),
+                FUNCT7_SRL => return render_rtype(insn, "srl"),
+                _ => return render_illegal_insn(insn),
+            }
+
+            FUNCT3_OR => return render_rtype(insn, "or"),
+            FUNCT3_XOR => return render_rtype(insn, "xor"),
+            FUNCT3_AND => return render_rtype(insn, "and"),
+            FUNCT3_SLT => return render_rtype(insn, "slt"),
+            FUNCT3_SLL => return render_rtype(insn, "sll"),
+            FUNCT3_SLTU => return render_rtype(insn, "sltu"),
             _ => return render_illegal_insn(insn),
         }
-
         //catch-all
         _ => return render_illegal_insn(insn),
     }
