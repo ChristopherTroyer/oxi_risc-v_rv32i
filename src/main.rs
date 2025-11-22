@@ -35,12 +35,11 @@ struct Cli{
  *  loops through memory and decodes each 32-bit instruction
  *  mem current system memory
  */
-fn disassemble(mem:Memory){
+fn disassemble(mem:&Memory){
     for i in (0..mem.get_size()).step_by(4){
         print!("{:0>8}: ", hex::to_hex32(i));
         print!("{:0>8}", hex::to_hex32(mem.get32(i)));
         //render instruction via decode function
-        //println!(" {}", rv32i_decode::decode(i,mem.get32(i)));
         println!("  {}",rv32i_decode::decode(i,mem.get32(i)));
     }
 }
@@ -52,10 +51,11 @@ fn main(){
     //let filename = args.input_file;
     //println!("Loading file: {:?}", filename);
 
-    //MEM.dump();
-    mem.load_file("target/debug/input/align.bin".to_string());
-    //mem.dump();
-    disassemble(mem);
+
+    mem.load_file("target/debug/input/a4/badhex.bin".to_string());
+
+    disassemble(&mem);
+    mem.dump();
 
     exit(0);
 }

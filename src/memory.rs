@@ -148,7 +148,9 @@ impl Memory {
 
             for x in index..index+16{ //ascii printable HEX 21 to 7E
                 let num = self.get8(x) as char;
-                if num.is_ascii_graphic()  {
+
+                //if num.is_ascii_graphic() && !num.is_ascii_whitespace()  {
+                if num >= '\x20' && num <= '\x7e' {
                     print!("{}", num as char);
                 }
                 else{
