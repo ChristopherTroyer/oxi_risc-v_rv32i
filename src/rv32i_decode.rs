@@ -168,7 +168,7 @@ fn render_jalr(insn:u32) -> String{
     let rd: u32 = get_rd(insn);
     let rs1: u32 = get_rs1(insn);
     let imm_i: i32 = get_imm_i(insn);
-    format!("{}{},{}",render_mnemonic("jal"),render_reg(rd),render_base_disp(imm_i, rs1))
+    format!("{}{},{}",render_mnemonic("jalr"),render_reg(rd),render_base_disp(imm_i, rs1))
 }
 
 //types

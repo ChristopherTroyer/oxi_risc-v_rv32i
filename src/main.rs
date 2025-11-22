@@ -23,7 +23,7 @@ struct Cli{
     dump_hart: bool,
     #[arg(short = 'z',long,help="Show dump of hart status and memory after simulation is haulted.")]
     dump_hart_after: bool,
-    #[arg(short = 'm',long,default_value_t = 0x8500, help="Specify memory size.")] //default 0x100
+    #[arg(short = 'm',long,default_value_t = 0x100, help="Specify memory size.")] //default 0x100
     memory_limit: u32,
     #[arg(short = 'l', long, default_value_t = 0, help="Maximum limit of instructions to execute.")]
     exec_limit: u64,
@@ -37,12 +37,11 @@ struct Cli{
  */
 fn disassemble(mem:Memory){
     for i in (0..mem.get_size()).step_by(4){
-        print!("{:>8}: ", i);
-        print!("{:>8}", mem.get32(i));
+        print!("{:0>8}: ", hex::to_hex32(i));
+        print!("{:0>8}", hex::to_hex32(mem.get32(i)));
         //render instruction via decode function
-        print!(" -> ");
         //println!(" {}", rv32i_decode::decode(i,mem.get32(i)));
-        println!("{}",rv32i_decode::decode(i,mem.get32(i)));
+        println!("  {}",rv32i_decode::decode(i,mem.get32(i)));
     }
 }
 
@@ -54,7 +53,7 @@ fn main(){
     //println!("Loading file: {:?}", filename);
 
     //MEM.dump();
-    mem.load_file("target/debug/input/torture5.bin".to_string());
+    mem.load_file("target/debug/input/align.bin".to_string());
     //mem.dump();
     disassemble(mem);
 
