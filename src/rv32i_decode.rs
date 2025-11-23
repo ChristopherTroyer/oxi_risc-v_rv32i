@@ -123,7 +123,7 @@ fn get_imm_j(insn:u32) -> i32{
     let mut imm_j: u32 = (insn & 0x80000000) >> (31-20);
     imm_j |= (insn & 0x7fe00000) >> (21-1);
     imm_j |= (insn & 0x00100000) >> (20-11);
-    imm_j |= (insn & 0x000ff000);
+    imm_j |= insn & 0x000ff000;
 
     if (insn & 0x80000000) != 0{
         imm_j |= 0xffe00000;
@@ -142,7 +142,7 @@ fn render_reg(r:u32) -> String{
     format!("x{}",r)
 }
 
-fn render_illegal_insn(insn:u32) -> String{
+fn render_illegal_insn(_insn:u32) -> String{
     "ERROR: UNIMPLEMENTED INSTRUCTION".to_string()
 }
 
@@ -261,9 +261,9 @@ pub fn decode(addr:u32, insn:u32) -> String{
             FUNCT3_CSRRW => return render_csrrx(insn, "csrrw"),
             FUNCT3_CSRRS => return render_csrrx(insn, "csrrs"),
             FUNCT3_CSRRC => return render_csrrx(insn, "csrrc"),
-            FUNCT3_CSRRWI => return render_csrrx(insn, "csrrwi"),
-            FUNCT3_CSRRSI => return render_csrrx(insn, "csrrsi"),
-            FUNCT3_CSRRCI => return render_csrrx(insn, "csrrci"),
+            FUNCT3_CSRRWI => return render_csrrxi(insn, "csrrwi"),
+            FUNCT3_CSRRSI => return render_csrrxi(insn, "csrrsi"),
+            FUNCT3_CSRRCI => return render_csrrxi(insn, "csrrci"),
             FUNCT3_BEQ => match insn{
                 INSN_EBREAK => render_ebreak(insn),
                 INSN_ECALL => render_ecall(insn),
@@ -322,13 +322,13 @@ pub fn decode(addr:u32, insn:u32) -> String{
 
         OPCODE_RTYPE => match funct3 {
             //TODO: FILL IN AND CONTINUE FROM LINE 323 in rv32i_decode.cpp
-            FUNCT3_ADD => match(funct7){
+            FUNCT3_ADD => match funct7{
                 FUNCT7_ADD => return render_rtype(insn, "add"),
                 FUNCT7_SUB => return render_rtype(insn, "sub"),
                 _ => return render_illegal_insn(insn),
             }
 
-            FUNCT3_SRX => match(funct7){
+            FUNCT3_SRX => match funct7{
                 FUNCT7_SRA => return render_rtype(insn, "sra"),
                 FUNCT7_SRL => return render_rtype(insn, "srl"),
                 _ => return render_illegal_insn(insn),

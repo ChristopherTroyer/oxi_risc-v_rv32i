@@ -126,41 +126,41 @@ impl Memory {
     /**@}*/
 
     /**
-    * Prints entire contents of memory as both hex and ASCII
+    * Returns formated string of entire contents of memory as both hex and ASCII
     * 
     */
-    pub fn dump(&self){
+    pub fn dump(&self) -> String{
+        let mut result = String::new();
         for index in (0..self.get_size()).step_by(16) {
-            print!("{:>8}: ",hex::to_hex32(index));
-
+            result.push_str(&format!("{:>8}: ",hex::to_hex32(index)));
             for x in index..index+16{
-                print!("{}", hex::to_hex8(self.get8(x as u32)));
+                result.push_str(&format!("{}", hex::to_hex8(self.get8(x as u32))));
 
                 if (x-index)==7{ //space at mid point
-                    print!("  ");
+                    result.push_str("  ");
                 }
                 if (x-index)!=7{
-                    print!(" ");
+                    result.push_str(" ");
                 }
             }
-
-            print!("*");
-
-            for x in index..index+16{ //ascii printable HEX 21 to 7E
+            result.push_str("*");
+            for x in index..index+16{ //ascii printable HEX 21 to 7
                 let num = self.get8(x) as char;
-
                 //if num.is_ascii_graphic() && !num.is_ascii_whitespace()  {
                 if num >= '\x20' && num <= '\x7e' {
-                    print!("{}", num as char);
+                    result.push_str(&format!("{}", num as char));
                 }
                 else{
-                    print!(".");
+                    result.push_str(".");
                 }
             }
-
-            println!("*");  
+            result.push_str("*\n");
         }
+        result
     }
+
+
+
 
     pub fn load_file(& mut self, fname: String) -> bool{
         let mut load_state = true; //Return value, only changes upon failure

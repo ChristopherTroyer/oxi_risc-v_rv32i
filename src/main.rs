@@ -35,13 +35,15 @@ struct Cli{
  *  loops through memory and decodes each 32-bit instruction
  *  mem current system memory
  */
-fn disassemble(mem:&Memory){
+fn disassemble(mem:&Memory) -> String{
+    let mut result = String::new();
     for i in (0..mem.get_size()).step_by(4){
-        print!("{:0>8}: ", hex::to_hex32(i));
-        print!("{:0>8}", hex::to_hex32(mem.get32(i)));
+        result.push_str(&format!("{:0>8}: ", hex::to_hex32(i)));
+        result.push_str(&format!("{:0>8}", hex::to_hex32(mem.get32(i))));
         //render instruction via decode function
-        println!("  {}",rv32i_decode::decode(i,mem.get32(i)));
+        result.push_str(&format!("  {}\n",rv32i_decode::decode(i,mem.get32(i))));
     }
+    result
 }
 
 fn main(){
@@ -54,8 +56,8 @@ fn main(){
 
     mem.load_file("target/debug/input/a4/badhex.bin".to_string());
 
-    disassemble(&mem);
-    mem.dump();
+    println!("{}", disassemble(&mem));
+    println!("{}", mem.dump());
 
     exit(0);
 }
@@ -82,5 +84,62 @@ mod tests{
         assert_eq!(RF.get(0), 0);
         RF.reset();
         assert_eq!(RF.get(1), 0xf0f0f0f0);
+    }
+
+    #[test]
+    fn test_memory(){
+        let mut mem = Memory::new(64);
+        mem.set8(0, 0x12);
+        mem.set8(1, 0x34);
+        mem.set8(2, 0x56);
+        mem.set8(3, 0x78);
+        assert_eq!(mem.get8(0), 0x12);
+        assert_eq!(mem.get16(0), 0x3412);
+        assert_eq!(mem.get32(0), 0x78563412);
+    }
+
+    #[test]
+    fn test_decode_instructions(){
+        assert_eq!(rv32i_decode::decode(0, 0x00000013), "addi    x0,x0,0");
+        assert_eq!(rv32i_decode::decode(0, 0x00500113), "addi    x2,x0,5");
+        assert_eq!(rv32i_decode::decode(0, 0x00008067), "jalr    x0,0(x1)");
+        assert_eq!(rv32i_decode::decode(0, 0x00000073), "ecall");
+    }
+
+    #[test]
+    fn test_decode_illegal(){
+        assert_eq!(rv32i_decode::decode(0, 0x00000000), "ERROR: UNIMPLEMENTED INSTRUCTION");
+        assert_eq!(rv32i_decode::decode(0, 0xffffffff), "ERROR: UNIMPLEMENTED INSTRUCTION");
+    }
+
+
+    #[test]
+    fn test_decode_allinsn(){
+        let mut mem = Memory::new(0xc0);
+        mem.load_file("target/debug/input/a4/allinsns.bin".to_string());
+
+        let test_output = format!("{}{}", disassemble(&mem), mem.dump());
+        let expected_output = include_str!("../target/debug/input/a4/allinsns-mc0.out");
+        let lExpected = expected_output.lines();
+        let lTest = test_output.lines();
+
+        for (line_e, line_t) in lExpected.zip(lTest){
+            assert_eq!(line_e, line_t);
+        }
+    }
+
+    #[test]
+    fn test_decode_allnsns4(){
+        let mut mem = Memory::new(0xc0);
+        mem.load_file("target/debug/input/a4/allinsns4.bin".to_string());
+
+        let test_output = format!("{}{}", disassemble(&mem), mem.dump());
+        let expected_output = include_str!("../target/debug/input/a4/allinsns4-mc0.out");
+        let lExpected = expected_output.lines();
+        let lTest = test_output.lines();
+
+        for (line_e, line_t) in lExpected.zip(lTest){
+            assert_eq!(line_e, line_t);
+        }
     }
 }
