@@ -17,17 +17,18 @@ impl Memory {
     */
     pub fn new(mut s:u32) -> Memory {
         let mut mem = Vec::new();
-        s = (s+15)&0xfffffff0;
-        mem.resize(s.try_into().unwrap(), 0xa5);
-        let mut memory = Memory { mem };
+        //round up to nearest multiple of 16
+        s = (s+15)&0xfffffff0; 
+        mem.resize(s as usize, 0xa5);
+        let memory = Memory { mem };
         memory
     }
 
     pub fn check_illegal(&self, addr:u32) -> bool{
-        if addr >= self.get_size(){
+        if addr > self.get_size(){
             println!("WARNING: Address out of range: {}", hex::to_hex0x32(addr));
         }
-        addr >= self.get_size()
+        addr > self.get_size()
     }
 
     /**
@@ -171,6 +172,7 @@ impl Memory {
                 //let real_file = file.unwrap();
                 //println!("begin load"); //TODO
                 if self.check_illegal(content.len() as u32){
+                    //println!("bonus debug: file size {}", content.len() as u32);
                     println!("Program too big.");
                     load_state = false;
                 }

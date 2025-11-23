@@ -2,7 +2,7 @@
 
 use std::process::exit;
 use clap::Parser;
-use std::path::PathBuf;
+//use std::path::PathBuf;
 
 use crate::register::RegisterFile;
 use crate::memory::Memory;
@@ -49,22 +49,30 @@ fn disassemble(mem:&Memory) -> String{
 fn main(){
     let args = Cli::parse();
     //let rf = RegisterFile::new();
-    let mut mem = Memory::new(args.memory_limit);
+    let mut mem = Memory::new(0x40);
     //let filename = args.input_file;
     //println!("Loading file: {:?}", filename);
 
-
-    mem.load_file("target/debug/input/a4/badhex.bin".to_string());
+    mem.load_file("target/debug/input/a4/tinyprog.bin".to_string());
 
     println!("{}", disassemble(&mem));
     println!("{}", mem.dump());
-
     exit(0);
 }
 
 #[cfg(test)]
 mod tests{
     use super::*;
+    use std::result;
+
+    fn string_lines_equal(s1: &str, s2: &str, tested_file: &str){
+        let lines1 = s1.lines();
+        let lines2 = s2.lines();
+
+        for (line1, line2) in lines1.zip(lines2) {
+            assert!(line1 == line2, "Lines in '{}' do not match:\n'{}'\n'{} <--- Expected'", tested_file, line1, line2);
+        }
+    }
 
     #[test]
     fn test_hex(){
@@ -112,20 +120,17 @@ mod tests{
         assert_eq!(rv32i_decode::decode(0, 0xffffffff), "ERROR: UNIMPLEMENTED INSTRUCTION");
     }
 
-
     #[test]
     fn test_decode_allinsn(){
         let mut mem = Memory::new(0xc0);
+
+
         mem.load_file("target/debug/input/a4/allinsns.bin".to_string());
 
         let test_output = format!("{}{}", disassemble(&mem), mem.dump());
         let expected_output = include_str!("../target/debug/input/a4/allinsns-mc0.out");
-        let lExpected = expected_output.lines();
-        let lTest = test_output.lines();
 
-        for (line_e, line_t) in lExpected.zip(lTest){
-            assert_eq!(line_e, line_t);
-        }
+        string_lines_equal(&test_output, &expected_output, "allinsns.bin");
     }
 
     #[test]
@@ -135,11 +140,117 @@ mod tests{
 
         let test_output = format!("{}{}", disassemble(&mem), mem.dump());
         let expected_output = include_str!("../target/debug/input/a4/allinsns4-mc0.out");
-        let lExpected = expected_output.lines();
-        let lTest = test_output.lines();
 
-        for (line_e, line_t) in lExpected.zip(lTest){
-            assert_eq!(line_e, line_t);
-        }
+        string_lines_equal(&test_output, &expected_output, "allinsns4.bin");
+    }
+
+    #[test]
+    fn test_decode_badhex(){
+        let mut mem = Memory::new(0x100);
+        mem.load_file("target/debug/input/a4/badhex.bin".to_string());
+
+        let test_output = format!("{}{}", disassemble(&mem), mem.dump());
+        let expected_output = include_str!("../target/debug/input/a4/badhex-m100.out");
+
+        string_lines_equal(&test_output, &expected_output, "badhex.bin");
+    }
+
+    #[test]
+    fn test_decode_li(){
+        let mut mem = Memory::new(0x1);
+        mem.load_file("target/debug/input/a4/li.bin".to_string());
+
+        let test_output = format!("{}{}", disassemble(&mem), mem.dump());
+        let expected_output = include_str!("../target/debug/input/a4/li-m1.out");
+
+        string_lines_equal(&test_output, &expected_output, "li.bin");
+    }
+
+    #[test]
+    fn test_decode_master(){
+        let mut mem = Memory::new(0x100);
+        mem.load_file("target/debug/input/a4/master.bin".to_string());
+
+        let test_output = format!("{}{}", disassemble(&mem), mem.dump());
+        let expected_output = include_str!("../target/debug/input/a4/master.out");
+
+        string_lines_equal(&test_output, &expected_output, "master.bin");
+    }
+
+    #[test]
+    fn test_decode_pcrel(){
+        let mut mem = Memory::new(0x1000);
+        mem.load_file("target/debug/input/a4/pcrel.bin".to_string());
+
+        let test_output = format!("{}{}", disassemble(&mem), mem.dump());
+        let expected_output = include_str!("../target/debug/input/a4/pcrel-m1000.out");
+
+        string_lines_equal(&test_output, &expected_output, "pcrel.bin");
+    }
+
+    #[test]
+    fn test_decode_reladdr(){
+        let mut mem = Memory::new(0x20);
+        mem.load_file("target/debug/input/a4/reladdr.bin".to_string());
+
+        let test_output = format!("{}{}", disassemble(&mem), mem.dump());
+        let expected_output = include_str!("../target/debug/input/a4/reladdr-m20.out");
+
+        string_lines_equal(&test_output, &expected_output, "reladdr.bin");
+    }
+
+    #[test]
+    fn test_decode_sieve(){
+        let mut mem = Memory::new(0x33e68);
+        mem.load_file("target/debug/input/a4/sieve.bin".to_string());
+
+        let test_output = format!("{}{}", disassemble(&mem), mem.dump());
+        let expected_output = include_str!("../target/debug/input/a4/sieve-m33e68.out");
+
+        string_lines_equal(&test_output, &expected_output, "sieve.bin");
+    }
+
+    #[test]
+    fn test_decode_small(){
+        let mut mem = Memory::new(0xa0);
+        mem.load_file("target/debug/input/a4/small.bin".to_string());
+
+        let test_output = format!("{}{}", disassemble(&mem), mem.dump());
+        let expected_output = include_str!("../target/debug/input/a4/small-ma0.out");
+
+        string_lines_equal(&test_output, &expected_output, "small.bin");
+    }
+
+    #[test]
+    fn test_decode_tinyprog(){
+        let mut mem = Memory::new(0x40);
+        mem.load_file("target/debug/input/a4/tinyprog.bin".to_string());
+
+        let test_output = format!("{}{}", disassemble(&mem), mem.dump());
+        let expected_output = include_str!("../target/debug/input/a4/tinyprog-m40.out");
+
+        string_lines_equal(&test_output, &expected_output, "tinyprog.bin");
+    }
+
+    #[test]
+    fn test_decode_torture(){
+        let mut mem = Memory::new(0x410);
+        mem.load_file("target/debug/input/a4/torture.bin".to_string());
+
+        let test_output = format!("{}{}", disassemble(&mem), mem.dump());
+        let expected_output = include_str!("../target/debug/input/a4/torture-m410.out");
+
+        string_lines_equal(&test_output, &expected_output, "torture.bin");
+    }
+
+    #[test]
+    fn test_decode_torture5(){
+        let mut mem = Memory::new(0x500);
+        mem.load_file("target/debug/input/a4/torture5.bin".to_string());
+
+        let test_output = format!("{}{}", disassemble(&mem), mem.dump());
+        let expected_output = include_str!("../target/debug/input/a4/torture5-m500.out");
+
+        string_lines_equal(&test_output, &expected_output, "torture5.bin");
     }
 }
