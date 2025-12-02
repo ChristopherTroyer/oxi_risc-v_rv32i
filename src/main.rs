@@ -11,6 +11,7 @@ mod hex;
 mod register;
 mod memory;
 mod rv32i_decode;
+mod rv32i_hart;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]

@@ -54,31 +54,34 @@ impl RegisterFile {
         self.regs[reg as usize]
     }
     /**
-     * Prints contents of registers with optional header.
+     * Returns contents of registers as a string with optional header.
      * hdr:String string to append to lines of dump.
      */
-    pub fn dump(&self, hdr:String){
+    pub fn dump(&self, hdr:String) -> String{
+        let mut result = String::new();
+
         for index in (0..self.regs.len()).step_by(8) {
             let reg = "x".to_owned()+&index.to_string();
-            print!("{:>3} ",reg);
+            result.push_str(&format!("{:>3} ",reg));
 
             for x in index..index+8{
-                print!("{}", hex::to_hex32(self.get(x as u32)));
+                result.push_str(&format!("{}", hex::to_hex32(self.get(x as u32))));
 
                 if (x-index)==3{
-                    print!(" ");
+                    result.push(' ');
                 }
                 if (x-index)!=7{
-                    print!(" ");
+                    result.push(' ');
                 }
             }
             if hdr.len() > 0 {
-                println!(" {}",hdr);
+                result.push_str(&format!(" {}",hdr));
             }
             else{
-                println!();
+                result.push('\n');
             }
         }
+        result
     }
     
 }
