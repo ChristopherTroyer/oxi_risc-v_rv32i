@@ -3,8 +3,8 @@ use crate::memory::Memory;
 use crate::register::RegisterFile;
 
 
-//this struct needs a reference to memory and register file
-pub struct rv32i_hart{
+//this is a single hardware thread (hart)
+pub struct Rv32iHart{
     mem: Memory,
     regs: RegisterFile,
 
@@ -18,10 +18,18 @@ pub struct rv32i_hart{
     show_registers: bool,
 }
 
-impl rv32i_hart {
-    pub fn new(&self, m:&Memory)
+impl Rv32iHart {
+    pub fn new(mut self, m:Memory, r:RegisterFile)
     {
+        self.mem = m;
+        self.regs = r;
 
+        self.pc = 0;
+        self.insn_counter = 0;
+        self.mhartid = 0;
+
+        self.halt = false;
+        self.halt_reason = "none".to_string();
     }
     
     fn dump(&self, hdr:String) -> String{
