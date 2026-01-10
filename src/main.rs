@@ -6,6 +6,7 @@ use clap::Parser;
 
 use crate::register::RegisterFile;
 use crate::memory::Memory;
+use crate::rv32i_hart::Rv32iHart;
 
 mod hex;
 mod register;
@@ -58,6 +59,14 @@ fn main(){
 
     println!("{}", disassemble(&mem));
     println!("{}", mem.dump());
+
+    //test hart
+    let mut hart = Rv32iHart::new(mem, RegisterFile::new());
+    &hart.reset();
+    let id = hart.mhartid;
+    &hart.tick(format!("hart {}:", id).to_string());
+
+
     exit(0);
 }
 
