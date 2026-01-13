@@ -101,7 +101,7 @@ mod tests{
         RF.set(0, 5678);
         assert_eq!(RF.get(0), 0);
         RF.reset();
-        assert_eq!(RF.get(1), 0xf0f0f0f0);
+        assert_eq!(RF.get(1), 0xf0f0f0f0u32 as i32);
     }
 
     #[test]

@@ -1,10 +1,10 @@
 use crate::hex;
 use crate::memory::Memory;
 use crate::register::RegisterFile;
+use crate::rv32i_decode;
 use std::io::Write;
-use std::io;
-use std::ptr;
-
+use std::io::stdout;
+use std::io::sink;
 
 //this is a single hardware thread (hart)
 pub struct Rv32iHart{
@@ -32,7 +32,7 @@ impl Rv32iHart {
             mhartid: 0,
             halt: false,
             halt_reason: "none".to_string(),
-            show_instructions: true, //default false
+            show_instructions: false, //default false
             show_registers: false,
         }
     }
@@ -53,7 +53,7 @@ impl Rv32iHart {
 
             if self.show_instructions{
                 print!("{}",&format!("{} {}: {} ", hdr.to_string(), hex::to_hex32(self.pc), hex::to_hex32(insn)));
-                self.exec(insn, Some(&mut io::stdout()));
+                self.exec(insn, Some(&mut stdout()));
                 println!();
             }
             else {
@@ -77,15 +77,44 @@ impl Rv32iHart {
         self.halt_reason = "none".to_string();
     }
 
-    fn exec(&self, insn:u32, writer: Option<&mut dyn io::Write>){
+    fn exec(&self, insn:u32, writer: Option<&mut dyn Write>){
+
+        let opcode: u32 = rv32i_decode::get_opcode(insn);
+        let funct3: u32 = rv32i_decode::get_funct3(insn);
+        let funct7: u32 = rv32i_decode::get_funct7(insn);
+
+
+        //sink any output if ostream not provided
+        let mut ostream: &mut dyn Write = &mut sink();
         match writer{
             Some(w) => {
-                let _ = w.write_all("YEAHHHH!!!".as_bytes()); //Placeholder
-                let _ = w.flush();
+                ostream = w;
             },
             None => {
-                //do nothing
             }
         }
+        
+        let _ = ostream.write_all("YEAHHHH!!!".as_bytes()); //Placeholder test
+        let _ = ostream.flush();
+    }
+
+    fn exec_illegal_insn(& mut self, insn:u32, pos: &mut dyn Write){
+        let _ = pos.write_all(rv32i_decode::render_illegal_insn(insn).as_bytes());
+        let _ = pos.flush();
+        self.halt = true;
+        self.halt_reason = "Illegal instruction".to_string();
+    }
+
+    fn exec_add(& mut self, insn:u32, pos: &mut dyn Write){
+        let rd: u32 = rv32i_decode::get_rd(insn);
+        let rs1: u32 = rv32i_decode::get_rs1(insn);
+        let rs2: u32 = rv32i_decode::get_rs2(insn);
+
+        let val: i32 = self.regs.get(rs1) as i32 + self.regs.get(rs2) as i32;
+
+        //render stuff here
+
+        self.regs.set(rd,val);
+        self.pc += 4;
     }
 }

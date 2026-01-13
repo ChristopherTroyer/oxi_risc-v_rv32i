@@ -3,7 +3,7 @@
  */
 use crate::hex;
 pub struct RegisterFile{
-    regs: Vec<u32>,
+    regs: Vec<i32>,
 }
 
 impl RegisterFile {
@@ -31,7 +31,7 @@ impl RegisterFile {
         self.set(0,0);
 
         for i in 0..self.regs.len() as i32 {
-            self.set(i as u32,0xf0f0f0f0);
+            self.set(i as u32,0xf0f0f0f0u32 as i32);
         }
     }
     /**
@@ -39,7 +39,7 @@ impl RegisterFile {
      * reg:u32 register to set.
      * val:u32 value to set register to.
      */
-    pub fn set(&mut self, reg:u32, val:u32){
+    pub fn set(&mut self, reg:u32, val:i32){
         if reg == 0 {
              return;
         }
@@ -50,7 +50,7 @@ impl RegisterFile {
      * r:u32 register to get value from.
      * Returns value:u32 in passed register.
      */
-    pub fn get(&self, reg:u32) -> u32{
+    pub fn get(&self, reg:u32) -> i32{
         self.regs[reg as usize]
     }
     /**
@@ -65,7 +65,7 @@ impl RegisterFile {
             result.push_str(&format!("{:>3} ",reg));
 
             for x in index..index+8{
-                result.push_str(&format!("{}", hex::to_hex32(self.get(x as u32))));
+                result.push_str(&format!("{}", hex::to_hex32(self.get(x as u32)as u32)));
 
                 if (x-index)==3{
                     result.push(' ');

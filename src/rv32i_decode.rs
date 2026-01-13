@@ -54,33 +54,33 @@ const FUNCT3_CSRRCI: u32 = 0b111;
 
 const XLEN:i32 = 32;
 
-fn get_opcode(insn:u32) -> u32{
+pub fn get_opcode(insn:u32) -> u32{
     insn & 0x0000007f
 }
 
-fn get_rd(insn:u32) -> u32{
+pub fn get_rd(insn:u32) -> u32{
     (insn & 0x00000f80)>>7
 }
 
-fn get_func3(insn:u32) -> u32{
+pub fn get_funct3(insn:u32) -> u32{
     (insn & 0x00007000)>>12
 }
 
-fn get_rs1(insn:u32) -> u32{
+pub fn get_rs1(insn:u32) -> u32{
     (insn & 0x000f8000)>>15
 }
 
-fn get_rs2(insn:u32) -> u32{
+pub fn get_rs2(insn:u32) -> u32{
     (insn & 0x01f00000)>>20
 }
 
-fn get_func7(insn:u32) -> u32{
+pub fn get_funct7(insn:u32) -> u32{
     (insn & 0xfe000000)>>25
 }
 
 //immediate values
 
-fn get_imm_i(insn:u32) -> i32{
+pub fn get_imm_i(insn:u32) -> i32{
     let mut imm_i:u32 = (insn & 0xfff00000) >> 20;
     if (imm_i & 0x800) != 0 {
         imm_i |= 0xfffff000;
@@ -88,13 +88,13 @@ fn get_imm_i(insn:u32) -> i32{
     imm_i as i32
 }
 
-fn get_imm_u(insn:u32) -> i32{
+pub fn get_imm_u(insn:u32) -> i32{
     //Zero Extended on the right
     let imm_u: u32 = insn & 0xfffff000;
     imm_u as i32
 }
 
-fn get_imm_b(insn:u32) -> i32{
+pub fn get_imm_b(insn:u32) -> i32{
     let mut imm_b: u32 = (insn & 0x80000000) >> (31-12);
     imm_b |= (insn & 0x7e000000) >> (25-5);
     imm_b |= (insn & 0x00000f00) >> (8-1);
@@ -108,7 +108,7 @@ fn get_imm_b(insn:u32) -> i32{
     imm_b as i32
 }
 
-fn get_imm_s(insn:u32) -> i32{
+pub fn get_imm_s(insn:u32) -> i32{
     let mut imm_s: u32 = (insn & 0xfe000000) >> (25-5);
     imm_s |= (insn & 0x00000f80) >> (7-0);
     
@@ -119,7 +119,7 @@ fn get_imm_s(insn:u32) -> i32{
     imm_s as i32
 }
 
-fn get_imm_j(insn:u32) -> i32{
+pub fn get_imm_j(insn:u32) -> i32{
     let mut imm_j: u32 = (insn & 0x80000000) >> (31-20);
     imm_j |= (insn & 0x7fe00000) >> (21-1);
     imm_j |= (insn & 0x00100000) >> (20-11);
@@ -142,29 +142,29 @@ fn render_reg(r:u32) -> String{
     format!("x{}",r)
 }
 
-fn render_illegal_insn(_insn:u32) -> String{
+pub fn render_illegal_insn(_insn:u32) -> String{
     "ERROR: UNIMPLEMENTED INSTRUCTION".to_string()
 }
 
-fn render_lui(insn:u32) -> String{
+pub fn render_lui(insn:u32) -> String{
     let rd: u32 = get_rd(insn);
     let imm_u: i32 = get_imm_u(insn);
     format!("{}{},{}",render_mnemonic("lui"),render_reg(rd),to_hex0x20((imm_u as u32>>12)&0x0fffff))
 }
 
-fn render_auipc(insn:u32) -> String{
+pub fn render_auipc(insn:u32) -> String{
     let rd: u32 = get_rd(insn);
     let imm_u: i32 = get_imm_u(insn);
     format!("{}{},{}",render_mnemonic("auipc"),render_reg(rd),to_hex0x20((imm_u as u32>>12)&0x0fffff))
 }
 
-fn render_jal(addr:u32, insn:u32) -> String{
+pub fn render_jal(addr:u32, insn:u32) -> String{
     let rd: u32 = get_rd(insn);
     let imm_j: i32 = get_imm_j(insn);
     format!("{}{},{}",render_mnemonic("jal"),render_reg(rd),hex::to_hex0x32(imm_j.wrapping_add_unsigned(addr) as u32)) //POSSIBLY NOT CORRECT BUT WRAPPING TO AVOID OVERFLOW PANIC
 }
 
-fn render_jalr(insn:u32) -> String{
+pub fn render_jalr(insn:u32) -> String{
     let rd: u32 = get_rd(insn);
     let rs1: u32 = get_rs1(insn);
     let imm_i: i32 = get_imm_i(insn);
@@ -173,7 +173,7 @@ fn render_jalr(insn:u32) -> String{
 
 //types
 
-fn render_btype(addr:u32, insn:u32, mnemonic:&str) -> String{
+pub fn render_btype(addr:u32, insn:u32, mnemonic:&str) -> String{
     let imm_b: i32 = get_imm_b(insn);
     let rs1: u32 = get_rs1(insn);
     let rs2: u32 = get_rs2(insn);
@@ -181,7 +181,7 @@ fn render_btype(addr:u32, insn:u32, mnemonic:&str) -> String{
     format!("{}{},{},{}", render_mnemonic(mnemonic), render_reg(rs1),render_reg(rs2),hex::to_hex0x32(imm_b.wrapping_add_unsigned(addr) as u32)) //POSSIBLY NOT CORRECT BUT WRAPPING TO AVOID OVERFLOW PANIC
 }
 
-fn render_itype_load(insn:u32, mnemonic:&str) -> String{
+pub fn render_itype_load(insn:u32, mnemonic:&str) -> String{
     let rd: u32 = get_rd(insn);
     let rs1: u32 = get_rs1(insn);
     let imm_i: i32 = get_imm_i(insn);
@@ -189,7 +189,7 @@ fn render_itype_load(insn:u32, mnemonic:&str) -> String{
     format!("{}{},{}", render_mnemonic(mnemonic),render_reg(rd),render_base_disp(imm_i, rs1))
 }
 
-fn render_stype(insn:u32, mnemonic:&str) -> String{
+pub fn render_stype(insn:u32, mnemonic:&str) -> String{
     let imm_s: i32 = get_imm_s(insn);
     let rs1: u32 = get_rs1(insn);
     let rs2: u32 = get_rs2(insn);
@@ -197,14 +197,14 @@ fn render_stype(insn:u32, mnemonic:&str) -> String{
     format!("{}{},{}", render_mnemonic(mnemonic),render_reg(rs2),render_base_disp(imm_s, rs1))
 }
 
-fn render_itype_alu(insn:u32, mnemonic:&str, imm_i:i32) -> String{
+pub fn render_itype_alu(insn:u32, mnemonic:&str, imm_i:i32) -> String{
     let rd: u32 = get_rd(insn);
     let rs1: u32 = get_rs1(insn);
 
     format!("{}{},{},{}",render_mnemonic(mnemonic),render_reg(rd),render_reg(rs1),imm_i)
 }
 
-fn render_rtype(insn:u32, mnemonic:&str) -> String{
+pub fn render_rtype(insn:u32, mnemonic:&str) -> String{
     let rd: u32 = get_rd(insn);
     let rs1: u32 = get_rs1(insn);
     let rs2: u32 = get_rs2(insn);
@@ -214,11 +214,11 @@ fn render_rtype(insn:u32, mnemonic:&str) -> String{
 
 //render controls
 
-fn render_ecall(_insn:u32) -> String{
+pub fn render_ecall(_insn:u32) -> String{
     "ecall".to_string()
 }
 
-fn render_ebreak(_insn:u32) -> String{
+pub fn render_ebreak(_insn:u32) -> String{
     "ebreak".to_string()
 }
 
@@ -249,8 +249,8 @@ fn render_base_disp(base:i32, disp:u32) -> String{
 
 pub fn decode(addr:u32, insn:u32) -> String{
     let opcode:u32 = get_opcode(insn);
-    let funct3: u32 = get_func3(insn);
-    let funct7:u32 = get_func7(insn);
+    let funct3: u32 = get_funct3(insn);
+    let funct7:u32 = get_funct7(insn);
     let imm_i: i32 = get_imm_i(insn);
 
     //println!("opcode={} funct3={} funct7={} imm_i={}", opcode,funct3,funct7,imm_i);
