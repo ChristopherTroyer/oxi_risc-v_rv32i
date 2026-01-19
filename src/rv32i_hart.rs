@@ -6,6 +6,8 @@ use std::io::Write;
 use std::io::stdout;
 use std::io::sink;
 
+const INSTRUCTION_WIDTH: i32 = 35;
+
 //this is a single hardware thread (hart)
 pub struct Rv32iHart{
     mem: Memory,
@@ -32,7 +34,7 @@ impl Rv32iHart {
             mhartid: 0,
             halt: false,
             halt_reason: "none".to_string(),
-            show_instructions: false, //default false
+            show_instructions: true, //default false
             show_registers: false,
         }
     }
@@ -94,7 +96,7 @@ impl Rv32iHart {
             }
         }
         
-        let _ = ostream.write_all("YEAHHHH!!!".as_bytes()); //Placeholder test
+        let _ = ostream.write_all("YEAHHHH!!!\n".as_bytes()); //Placeholder test
         let _ = ostream.flush();
     }
 
@@ -113,6 +115,16 @@ impl Rv32iHart {
         let val: i32 = self.regs.get(rs1) as i32 + self.regs.get(rs2) as i32;
 
         //render stuff here
+        let mut s: String = rv32i_decode::render_rtype(insn, "add");
+        s = format!("{:<width$}",s,width = INSTRUCTION_WIDTH as usize);
+        s = format!("{}// {} = {} + {} = {}\n",s, 
+        rv32i_decode::render_reg(rd),
+        hex::to_hex0x32(self.regs.get(rs1) as u32),
+        hex::to_hex0x32(self.regs.get(rs2) as u32),
+        hex::to_hex0x32(val as u32));
+
+        let _ = pos.write_all(s.as_bytes());
+        let _ = pos.flush();
 
         self.regs.set(rd,val);
         self.pc += 4;

@@ -138,7 +138,7 @@ fn render_mnemonic(m:&str) -> String{
     format!("{:<8}",m)
 }
 
-fn render_reg(r:u32) -> String{
+pub fn render_reg(r:u32) -> String{
     format!("x{}",r)
 }
 
