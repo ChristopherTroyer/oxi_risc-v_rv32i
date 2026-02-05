@@ -101,8 +101,11 @@ impl Rv32iHart {
     }
 
     fn exec_illegal_insn(& mut self, insn:u32, pos: &mut dyn Write){
-        let _ = pos.write_all(rv32i_decode::render_illegal_insn(insn).as_bytes());
-        let _ = pos.flush();
+        if self.show_instructions{
+            let _ = pos.write_all(rv32i_decode::render_illegal_insn(insn).as_bytes());
+            let _ = pos.flush();
+        }
+
         self.halt = true;
         self.halt_reason = "Illegal instruction".to_string();
     }
@@ -115,18 +118,108 @@ impl Rv32iHart {
         let val: i32 = self.regs.get(rs1) as i32 + self.regs.get(rs2) as i32;
 
         //render stuff here
-        let mut s: String = rv32i_decode::render_rtype(insn, "add");
-        s = format!("{:<width$}",s,width = INSTRUCTION_WIDTH as usize);
-        s = format!("{}// {} = {} + {} = {}\n",s, 
-        rv32i_decode::render_reg(rd),
-        hex::to_hex0x32(self.regs.get(rs1) as u32),
-        hex::to_hex0x32(self.regs.get(rs2) as u32),
-        hex::to_hex0x32(val as u32));
+        if self.show_instructions{
+            let mut s: String = rv32i_decode::render_rtype(insn, "add");
+            s = format!("{:<width$}",s,width = INSTRUCTION_WIDTH as usize);
+            s = format!("{}// {} = {} + {} = {}\n",s, 
+            rv32i_decode::render_reg(rd),
+            hex::to_hex0x32(self.regs.get(rs1) as u32),
+            hex::to_hex0x32(self.regs.get(rs2) as u32),
+            hex::to_hex0x32(val as u32));
 
-        let _ = pos.write_all(s.as_bytes());
-        let _ = pos.flush();
+            let _ = pos.write_all(s.as_bytes());
+            let _ = pos.flush();
+        }
 
         self.regs.set(rd,val);
         self.pc += 4;
     }
+
+    fn exec_addi(& mut self, insn:u32, pos: &mut dyn Write){
+        let rd: u32 = rv32i_decode::get_rd(insn);
+        let rs1: u32 = rv32i_decode::get_rs1(insn);
+        let imm_i: i32 = rv32i_decode::get_imm_i(insn);
+
+        let val: i32 = self.regs.get(rs1) as i32 + imm_i as i32;
+
+        //render stuff here
+        if self.show_instructions{
+            let mut s: String = rv32i_decode::render_itype_alu(insn, "addi", imm_i);
+            s = format!("{:<width$}",s,width = INSTRUCTION_WIDTH as usize);
+            s = format!("{}// {} = {} + {} = {}\n",s, 
+            rv32i_decode::render_reg(rd),
+            hex::to_hex0x32(self.regs.get(rs1) as u32),
+            hex::to_hex0x32(imm_i as u32),
+            hex::to_hex0x32(val as u32));
+
+            let _ = pos.write_all(s.as_bytes());
+            let _ = pos.flush();
+        }
+
+        self.regs.set(rd,val);
+        self.pc += 4;
+    }
+
+    fn exec_and(& mut self, insn:u32, pos: &mut dyn Write){
+        let rd: u32 = rv32i_decode::get_rd(insn);
+        let rs1: u32 = rv32i_decode::get_rs1(insn);
+        let rs2: u32 = rv32i_decode::get_rs2(insn);
+
+        let val: i32 = self.regs.get(rs1) & self.regs.get(rs2);
+
+        //put render stuff here
+        //TODO: look into switching render work off if pos is sink
+
+        self.regs.set(rd,val);
+        self.pc += 4;
+
+    }
+
+    fn exec_andi(& mut self, insn:u32, pos: &mut dyn Write){
+        let rd: u32 = rv32i_decode::get_rd(insn);
+        let rs1: u32 = rv32i_decode::get_rs1(insn);
+        let imm_i: i32 = rv32i_decode::get_imm_i(insn);
+
+        let val: i32 = self.regs.get(rs1) & imm_i;
+
+        //put render stuff here
+        //TODO: look into switching render work off if pos is sink
+
+        self.regs.set(rd,val);
+        self.pc += 4;
+
+    }
+
+    fn exec_auipc(& mut self, insn:u32, pos: &mut dyn Write){
+        let rd: u32 = rv32i_decode::get_rd(insn);
+        let imm_u: i32 = rv32i_decode::get_imm_u(insn);
+
+        let val: i32 = self.pc as i32 + imm_u;
+
+        //render stuff
+
+        self.regs.set(rd, val);
+        self.pc+=4;
+
+    }
+
+// ----------------------------------------------------------------
+// B type
+    fn exec_btype(& mut self, insn:u32, pos: &mut dyn Write){
+        let funt3: u32 =  rv32i_decode::get_funct3(insn);
+        let rs1: u32 =  rv32i_decode::get_rs1(insn);
+        let rs2: u32 =  rv32i_decode::get_rs2(insn);
+        let imm_b: i32 =  rv32i_decode::get_imm_b(insn);
+
+        let mut render_str:String = String::new();
+        let mut mnemonic:String = String::new();
+
+
+
+
+    }
+
+// ----------------------------------------------------------------
+// C type
+
 }
